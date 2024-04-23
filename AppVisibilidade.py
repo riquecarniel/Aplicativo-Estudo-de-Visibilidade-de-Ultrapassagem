@@ -191,8 +191,6 @@ def verificar():
 
     df_velocidades = pd.DataFrame.from_dict(dict_velocidades, orient="index", columns=["Distância"]).reset_index(names=["Velocidade"])
 
-    df_velocidades.to_excel(caminho_salvar + "\\Velocidades.xlsx", index=False)
-
     def verificar_alt(pto, sentido):
         if pto in df_altimetria["Estaca"].values:
             ponto = df_altimetria[df_altimetria["Estaca"] == pto]["Ponto"].values[0]
