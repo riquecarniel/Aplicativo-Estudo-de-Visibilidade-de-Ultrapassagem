@@ -166,12 +166,8 @@ def verificar():
     pontos_analise = list(range(ponto_inicial, ponto_final + 20, 20))
     df_analise = pd.DataFrame(pontos_analise, columns=["Estaca"])
 
-    df_planimetria["Ponto"] = [
-        Point(round(row[3], 4), round(row[2], 4)) for row in df_planimetria.itertuples()
-    ]
-    df_altimetria["Ponto"] = [
-        Point(row[1], row[2]) for row in df_altimetria.itertuples()
-    ]
+    df_planimetria["Ponto"] = [Point(round(row[3], 4), round(row[2], 4)) for row in df_planimetria.itertuples()]
+    df_altimetria["Ponto"] = [Point(row[1], row[2]) for row in df_altimetria.itertuples()]
 
     eixo = LineString(df_planimetria["Ponto"])
     eixo_esq = eixo.parallel_offset(largura_total, "left")
@@ -193,17 +189,15 @@ def verificar():
         110: 355,
     }
 
-    df_velocidades = pd.DataFrame.from_dict(
-        dict_velocidades, orient="index", columns=["Distância"]
-    ).reset_index(names=["Velocidade"])
+    df_velocidades = pd.DataFrame.from_dict(dict_velocidades, orient="index", columns=["Distância"]).reset_index(names=["Velocidade"])
+
+    df_velocidades.to_excel(caminho_salvar + "\\Velocidades.xlsx", index=False)
 
     def verificar_alt(pto, sentido):
         if pto in df_altimetria["Estaca"].values:
             ponto = df_altimetria[df_altimetria["Estaca"] == pto]["Ponto"].values[0]
 
-            raio = df_velocidades[df_velocidades["Velocidade"] == velocidade][
-                "Distância"
-            ].values[0]
+            raio = df_velocidades[df_velocidades["Velocidade"] == velocidade]["Distância"].values[0]
             circle = ponto.buffer(raio)
 
             intersection = linha_alt.intersection(circle)
@@ -233,13 +227,9 @@ def verificar():
     def verificar_plan(pto, sentido):
         try:
             if pto in df_planimetria["Estaca"].values:
-                ponto = df_planimetria[df_planimetria["Estaca"] == pto]["Ponto"].values[
-                    0
-                ]
+                ponto = df_planimetria[df_planimetria["Estaca"] == pto]["Ponto"].values[0]
 
-                raio = df_velocidades[df_velocidades["Velocidade"] == velocidade][
-                    "Distância"
-                ].values[0]
+                raio = df_velocidades[df_velocidades["Velocidade"] == velocidade]["Distância"].values[0]
                 circle = ponto.buffer(raio)
 
                 intersection = eixo.intersection(circle)
@@ -316,12 +306,9 @@ def verificar():
             "Altimetria Decrescente",
             "Planimetria Decrescente",
             "Typeline Decrescente",
-        ],
-    ).reset_index(names="Estaca")
+        ]).reset_index(names="Estaca")
 
-    df_dwg = pd.DataFrame.from_dict(
-        dict_sh, orient="index", columns=["Km Inicial", "Km Final", "Typeline", "Layer"]
-    )
+    df_dwg = pd.DataFrame.from_dict(dict_sh, orient="index", columns=["Km Inicial", "Km Final", "Typeline", "Layer"])
     df_dwg["Extensão"] = df_dwg["Km Final"] - df_dwg["Km Inicial"]
     nome_excel = caminho_salvar + "\\" + nome_arquivo + ".xlsx"
     df_dwg.to_excel(nome_excel, index=False)
@@ -332,9 +319,7 @@ def verificar():
 
     lista_coord = list(eixo.coords)
     df_coords = pd.DataFrame(lista_coord, columns=["Easting", "Northing"])
-    df_coords["Ponto"] = [
-        Point(round(row[1], 4), round(row[2], 4)) for row in df_coords.itertuples()
-    ]
+    df_coords["Ponto"] = [Point(round(row[1], 4), round(row[2], 4)) for row in df_coords.itertuples()]
     df_coords = df_coords[["Ponto"]]
     df_planimetria = df_planimetria[["Estaca", "Ponto"]]
 
@@ -343,9 +328,7 @@ def verificar():
     for row in df_dwg.itertuples():
         kmi = row[1]
         kmf = row[2]
-        filtro = df_planimetria.loc[
-            (df_planimetria["Estaca"] == kmi) | (df_planimetria["Estaca"] == kmf)
-        ]
+        filtro = df_planimetria.loc[(df_planimetria["Estaca"] == kmi) | (df_planimetria["Estaca"] == kmf)]
         linha = LineString(list(set(filtro["Ponto"].values)))
         midpoint = linha.centroid
         raio = linha.length / 2
