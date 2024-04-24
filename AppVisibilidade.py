@@ -308,8 +308,11 @@ def verificar():
 
     df_dwg = pd.DataFrame.from_dict(dict_sh, orient="index", columns=["Km Inicial", "Km Final", "Typeline", "Layer"])
     df_dwg["Extensão"] = df_dwg["Km Final"] - df_dwg["Km Inicial"]
+
+    df_dwg['Extensão'] = df_dwg['Extensão'].astype(str) + 'm'
+
     nome_excel = caminho_salvar + "\\" + nome_arquivo + ".xlsx"
-    df_dwg.to_excel(nome_excel, index=False)
+    df_dwg.to_excel(nome_excel, sheet_name='Resultado', index=False)
 
     gdf_eixo = gpd.read_file(caminho_dxf)
     gdf_eixo = gdf_eixo[gdf_eixo["Layer"] == "EIXO"]
